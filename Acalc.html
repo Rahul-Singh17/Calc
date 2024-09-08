@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMI and Investment Calculator</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #ff6f61, #d83a56);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-transform: uppercase;
+        }
+
+        .calculator-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .calculator {
+            flex: 1;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            margin: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-width: 500px;
+        }
+
+        .calculator:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .calculator h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .calculator label {
+            display: block;
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .calculator select, .calculator input, .calculator button {
+            margin: 10px 0;
+            padding: 15px;
+            width: calc(100% - 30px);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        .calculator select {
+            font-size: 16px;
+            border: 1px solid #e0aaff;
+        }
+
+        .calculator input {
+            font-size: 16px;
+            border: 1px solid #e0aaff;
+        }
+
+        .calculator button {
+            background: #28a745;
+            color: #fff;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .calculator button:hover {
+            background: #218838;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+        }
+
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+        }
+
+        footer p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>EMI and Investment Calculator</h1>
+
+        <div class="calculator-container">
+            <!-- EMI Calculator -->
+            <div class="calculator">
+                <h2>EMI Calculator</h2>
+                <label for="loan-amount">Loan Amount:</label>
+                <input type="number" id="loan-amount" placeholder="Enter loan amount">
+                <label for="interest-rate">Annual Interest Rate (in %):</label>
+                <input type="number" id="interest-rate" placeholder="Enter interest rate">
+                <label for="loan-term">Loan Term:</label>
+                <select id="loan-term-unit">
+                    <option value="12">Monthly</option>
+                    <option value="1">Yearly</option>
+                </select>
+                <input type="number" id="loan-term" placeholder="Enter loan term" min="1">
+                <button onclick="calculateEMI()">Calculate EMI</button>
+                <div class="result" id="emi-result"></div>
+            </div>
+
+            <!-- Investment Return Calculator -->
+            <div class="calculator">
+                <h2>Investment Return Calculator</h2>
+                <label for="investment-amount">Investment Amount:</label>
+                <input type="number" id="investment-amount" placeholder="Enter investment amount">
+                <label for="annual-return">Annual Return Rate (in %):</label>
+                <input type="number" id="annual-return" placeholder="Enter annual return rate">
+                <label for="investment-term">Investment Term:</label>
+                <select id="investment-type">
+                    <option value="one-time">One-time</option>
+                    <option value="recurring">Recurring</option>
+                </select>
+                <input type="number" id="investment-term" placeholder="Enter investment term" min="1">
+                <button onclick="calculateInvestmentReturn()">Calculate Return</button>
+                <div class="result" id="investment-result"></div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Created by Rahul Singh</p>
+        </footer>
+    </div>
+
+    <script>
+        function calculateEMI() {
+            const principal = parseFloat(document.getElementById('loan-amount').value);
+            const annualInterestRate = parseFloat(document.getElementById('interest-rate').value) / 100;
+            const termInYears = parseFloat(document.getElementById('loan-term').value);
+            const termUnit = document.getElementById('loan-term-unit').value;
+
+            if (isNaN(principal) || isNaN(annualInterestRate) || isNaN(termInYears) || principal <= 0 || annualInterestRate <= 0 || termInYears <= 0) {
+                document.getElementById('emi-result').innerText = 'Please enter valid values.';
+                return;
+            }
+
+            const monthlyInterestRate = annualInterestRate / 12;
+            const numberOfMonths = termUnit === '12' ? termInYears * 12 : termInYears;
+
+            const emi = (principal * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfMonths)) / (Math.pow(1 + monthlyInterestRate, numberOfMonths) - 1);
+            document.getElementById('emi-result').innerText = `Your EMI is ₹${emi.toFixed(2)}`;
+        }
+
+        function calculateInvestmentReturn() {
+            const principal = parseFloat(document.getElementById('investment-amount').value);
+            const annualReturnRate = parseFloat(document.getElementById('annual-return').value) / 100;
+            const termInYears = parseFloat(document.getElementById('investment-term').value);
+            const investmentType = document.getElementById('investment-type').value;
+
+            if (isNaN(principal) || isNaN(annualReturnRate) || isNaN(termInYears) || principal <= 0 || annualReturnRate <=
